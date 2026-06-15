@@ -27,7 +27,9 @@ export function pageNumberRenderer(options: PageNumberOptions | undefined): Head
   const inlineStyle = buildInlineStyle(options.style);
 
   return (currentPage: number, pageCount: number) => {
-    const text = format.replace(CURRENT_TOKEN, String(currentPage)).replace(TOTAL_TOKEN, String(pageCount));
+    const text = format
+      .replace(CURRENT_TOKEN, String(currentPage))
+      .replace(TOTAL_TOKEN, String(pageCount));
     return `<div style="${inlineStyle}">${text}</div>`;
   };
 }

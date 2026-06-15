@@ -23,9 +23,7 @@ describe('Rendering HTML templates', () => {
 
   describe('when given a list with iteration', () => {
     it('expands the loop into one fragment per item', () => {
-      const tmpl = createTemplate(
-        '<ul>{{#items}}<li>{{name}}: {{amount}}</li>{{/items}}</ul>',
-      );
+      const tmpl = createTemplate('<ul>{{#items}}<li>{{name}}: {{amount}}</li>{{/items}}</ul>');
 
       const html = tmpl.toHtml({
         items: [
@@ -58,9 +56,7 @@ describe('Rendering HTML templates', () => {
     it('awaits the data before rendering', async () => {
       const tmpl = createTemplate('<p>{{message}}</p>');
 
-      const result = await tmpl.render(
-        Promise.resolve({ message: 'async data' }),
-      );
+      const result = await tmpl.render(Promise.resolve({ message: 'async data' }));
 
       expect(isPdfBuffer(await result.toBuffer())).toBe(true);
     });

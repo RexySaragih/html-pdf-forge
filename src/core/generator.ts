@@ -7,16 +7,12 @@
  */
 
 import { promises as fs } from 'fs';
-import type {
-  TDocumentDefinitions,
-  TFontDictionary,
-} from 'pdfmake/interfaces';
+import type { TDocumentDefinitions, TFontDictionary } from 'pdfmake/interfaces';
 // Use eslint-disable to silence the require import; pdfmake is CommonJS
 // without proper ESM types.
 import { PdfGenerationError } from '../utils/errors';
 import type { PdfResult } from '../types';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const PdfPrinter = require('pdfmake') as new (fonts: TFontDictionary) => {
   createPdfKitDocument(docDef: TDocumentDefinitions): NodeJS.ReadableStream & {
     end(): void;
@@ -57,7 +53,9 @@ export function buildPdfResult({ docDefinition, fonts }: GeneratorInput): PdfRes
       const buffer = await generateBuffer();
       // The runtime `Blob` may come from globals (Node 18+) or from a polyfill;
       // we cast to satisfy older typings without forcing a hard dependency.
-      const BlobCtor = (globalThis as { Blob?: new (parts: unknown[], options?: { type?: string }) => Blob }).Blob;
+      const BlobCtor = (
+        globalThis as { Blob?: new (parts: unknown[], options?: { type?: string }) => Blob }
+      ).Blob;
       if (!BlobCtor) {
         throw new PdfGenerationError('Blob is not available in this runtime.');
       }

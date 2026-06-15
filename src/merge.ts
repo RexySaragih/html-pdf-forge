@@ -33,9 +33,7 @@ export interface MergeOptions {
 
 function isPdfResult(value: unknown): value is PdfResult {
   return Boolean(
-    value &&
-      typeof value === 'object' &&
-      typeof (value as PdfResult).toBuffer === 'function',
+    value && typeof value === 'object' && typeof (value as PdfResult).toBuffer === 'function',
   );
 }
 
@@ -55,7 +53,9 @@ async function readSource(input: MergeInput): Promise<Uint8Array> {
     const data = await fs.readFile(fullPath);
     return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
   }
-  throw new PdfMergeError('Unsupported merge source. Use Buffer, Uint8Array, PdfResult, or a file path.');
+  throw new PdfMergeError(
+    'Unsupported merge source. Use Buffer, Uint8Array, PdfResult, or a file path.',
+  );
 }
 
 function applyMetadata(doc: PDFDocument, meta: MergeOptions['metadata']): void {
@@ -71,7 +71,10 @@ function applyMetadata(doc: PDFDocument, meta: MergeOptions['metadata']): void {
  * document. Page order is preserved — pages from the first input come first,
  * then the second, and so on.
  */
-export async function mergePdfs(inputs: MergeInput[], options: MergeOptions = {}): Promise<PdfResult> {
+export async function mergePdfs(
+  inputs: MergeInput[],
+  options: MergeOptions = {},
+): Promise<PdfResult> {
   if (!Array.isArray(inputs) || inputs.length === 0) {
     throw new PdfMergeError('mergePdfs requires at least one input PDF.');
   }

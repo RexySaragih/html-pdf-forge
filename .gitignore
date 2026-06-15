@@ -1,3 +1,44 @@
+# Dependencies
 node_modules
+
+# Build output
 dist
+*.tsbuildinfo
+
+# Test artefacts
+coverage
+*.lcov
+.vitest-cache
+
+# Tool caches
+.eslintcache
+.prettiercache
+.cache
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Kiro workspace artefacts
 .kiro*
+
+# Generated FileTree
+\# File Tree:*.md

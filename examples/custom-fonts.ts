@@ -68,7 +68,6 @@ async function loadBundledRobotoBuffers(): Promise<{
   italics: Buffer;
   bolditalics: Buffer;
 }> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const vfs = require('pdfmake/build/vfs_fonts.js') as Record<string, string>;
   const decode = (key: string): Buffer => Buffer.from(vfs[key], 'base64');
   return {

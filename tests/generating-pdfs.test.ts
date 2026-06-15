@@ -83,7 +83,7 @@ describe('Generating a PDF from HTML', () => {
       // <div data-pdfmake='{"pageBreak":"after"}'></div>.
       const html =
         '<h1>Page 1</h1>' +
-        "<div data-pdfmake='{\"pageBreak\":\"after\"}'></div>" +
+        '<div data-pdfmake=\'{"pageBreak":"after"}\'></div>' +
         '<h1>Page 2</h1>';
       const result = await htmlToPdf(html);
 

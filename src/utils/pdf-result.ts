@@ -30,7 +30,9 @@ export function bufferToPdfResult(bytes: Buffer | Uint8Array): PdfResult {
       return buffer.toString('base64');
     },
     async toBlob(): Promise<Blob> {
-      const BlobCtor = (globalThis as { Blob?: new (parts: unknown[], options?: { type?: string }) => Blob }).Blob;
+      const BlobCtor = (
+        globalThis as { Blob?: new (parts: unknown[], options?: { type?: string }) => Blob }
+      ).Blob;
       if (!BlobCtor) {
         throw new PdfGenerationError('Blob is not available in this runtime.');
       }

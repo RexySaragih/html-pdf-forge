@@ -13,12 +13,7 @@ import type {
   TDocumentDefinitions,
   TFontDictionary,
 } from 'pdfmake/interfaces';
-import type {
-  HtmlPdfOptions,
-  Margins,
-  PageOptions,
-  PdfResult,
-} from '../types';
+import type { HtmlPdfOptions, Margins, PageOptions, PdfResult } from '../types';
 import { convertHtmlToPdfmake } from './converter';
 import { buildPdfResult } from './generator';
 import { inlineImages } from '../features/images';

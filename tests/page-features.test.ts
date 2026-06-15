@@ -11,9 +11,9 @@ import { isPdfBuffer, readPageCount } from './helpers/pdf-assertions';
 
 const MULTI_PAGE_HTML =
   '<h1>Page 1</h1>' +
-  "<div data-pdfmake='{\"pageBreak\":\"after\"}'></div>" +
+  '<div data-pdfmake=\'{"pageBreak":"after"}\'></div>' +
   '<h1>Page 2</h1>' +
-  "<div data-pdfmake='{\"pageBreak\":\"after\"}'></div>" +
+  '<div data-pdfmake=\'{"pageBreak":"after"}\'></div>' +
   '<h1>Page 3</h1>';
 
 describe('Decorating pages with header, footer, and page numbers', () => {

@@ -43,7 +43,6 @@ let qrcodeModule: QRCodeModule | null = null;
 
 function loadQrcode(): QRCodeModule {
   if (qrcodeModule === null) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const loaded = require('qrcode') as QRCodeModule | { default: QRCodeModule };
     qrcodeModule = 'toDataURL' in loaded ? loaded : loaded.default;
   }

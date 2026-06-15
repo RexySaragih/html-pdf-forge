@@ -44,7 +44,8 @@ async function fetchRemoteAsBase64(url: string): Promise<string> {
   }
   const arrayBuffer = await response.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const mime = inferMimeFromContentType(response.headers.get('content-type')) ?? inferMimeFromSrc(url);
+  const mime =
+    inferMimeFromContentType(response.headers.get('content-type')) ?? inferMimeFromSrc(url);
   return `${DATA_URI_PREFIX}${mime};base64,${buffer.toString('base64')}`;
 }
 

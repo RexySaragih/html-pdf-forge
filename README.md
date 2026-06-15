@@ -5,10 +5,10 @@ Generate PDFs from HTML with a clean TypeScript API. No headless browser, no nat
 A thin wrapper over [`html-to-pdfmake`](https://github.com/Aymkdn/html-to-pdfmake) and [`pdfmake`](https://github.com/bpampuch/pdfmake) that collapses the two-step pipeline into a single, ergonomic call. Adds first-class support for templates, headers/footers, page numbering, watermarks, merge/split, password protection, QR codes, and barcodes.
 
 ```ts
-import { htmlToPdf } from "html-pdf-forge";
+import { htmlToPdf } from 'html-pdf-forge';
 
-const pdf = await htmlToPdf("<h1>Hello</h1><p>From html-pdf-forge.</p>");
-await pdf.saveToFile("./hello.pdf");
+const pdf = await htmlToPdf('<h1>Hello</h1><p>From html-pdf-forge.</p>');
+await pdf.saveToFile('./hello.pdf');
 ```
 
 ## Why
@@ -34,24 +34,24 @@ Requires Node.js 18 or newer.
 ## Quickstart
 
 ```ts
-import { htmlToPdf } from "html-pdf-forge";
+import { htmlToPdf } from 'html-pdf-forge';
 
-const pdf = await htmlToPdf("<h1>Q4 Report</h1>", {
+const pdf = await htmlToPdf('<h1>Q4 Report</h1>', {
   page: {
-    size: "A4",
-    orientation: "portrait",
+    size: 'A4',
+    orientation: 'portrait',
     margins: { top: 40, right: 40, bottom: 40, left: 40 },
   },
   metadata: {
-    title: "Q4 Report",
-    author: "Jane Doe",
-    keywords: ["finance", "Q4"],
+    title: 'Q4 Report',
+    author: 'Jane Doe',
+    keywords: ['finance', 'Q4'],
   },
   header: '<div style="text-align:right">Q4 Report</div>',
-  pageNumber: { placement: "footer", format: "Page {current} of {total}" },
+  pageNumber: { placement: 'footer', format: 'Page {current} of {total}' },
 });
 
-await pdf.saveToFile("./q4-report.pdf");
+await pdf.saveToFile('./q4-report.pdf');
 ```
 
 The `PdfResult` returned from `htmlToPdf` exposes:
@@ -91,23 +91,23 @@ The primary entry point. All options are optional.
 Stateful variant for batch generation with shared defaults:
 
 ```ts
-import { HtmlPdfForge } from "html-pdf-forge";
+import { HtmlPdfForge } from 'html-pdf-forge';
 
 const forge = new HtmlPdfForge({
-  page: { size: "A4" },
-  metadata: { author: "Reporting Service" },
+  page: { size: 'A4' },
+  metadata: { author: 'Reporting Service' },
   fonts: {
     Inter: {
-      normal: "./fonts/Inter-Regular.ttf",
-      bold: "./fonts/Inter-Bold.ttf",
+      normal: './fonts/Inter-Regular.ttf',
+      bold: './fonts/Inter-Bold.ttf',
     },
   },
-  defaultFont: "Inter",
+  defaultFont: 'Inter',
 });
 
-const a = await forge.generate("<h1>Doc 1</h1>");
-const b = await forge.generate("<h1>Doc 2</h1>", {
-  metadata: { title: "Custom Title" },
+const a = await forge.generate('<h1>Doc 1</h1>');
+const b = await forge.generate('<h1>Doc 2</h1>', {
+  metadata: { title: 'Custom Title' },
 });
 ```
 
@@ -118,7 +118,7 @@ Per-call overrides win on conflicts; nested objects are deep-merged.
 Mustache-backed template:
 
 ```ts
-import { createTemplate } from "html-pdf-forge";
+import { createTemplate } from 'html-pdf-forge';
 
 const invoice = createTemplate(`
   <h1>Invoice #{{number}}</h1>
@@ -131,11 +131,11 @@ const invoice = createTemplate(`
 `);
 
 const pdf = await invoice.render({
-  number: "INV-0042",
-  customer: "Acme Corp",
+  number: 'INV-0042',
+  customer: 'Acme Corp',
   items: [
-    { description: "Consulting", amount: "$500" },
-    { description: "Design", amount: "$300" },
+    { description: 'Consulting', amount: '$500' },
+    { description: 'Design', amount: '$300' },
   ],
 });
 ```
@@ -147,10 +147,10 @@ const pdf = await invoice.render({
 ### Watermarks
 
 ```ts
-await htmlToPdf(html, { watermark: "CONFIDENTIAL" });
+await htmlToPdf(html, { watermark: 'CONFIDENTIAL' });
 
 await htmlToPdf(html, {
-  watermark: { text: "DRAFT", color: "red", opacity: 0.15, angle: -30 },
+  watermark: { text: 'DRAFT', color: 'red', opacity: 0.15, angle: -30 },
 });
 ```
 
@@ -159,10 +159,10 @@ await htmlToPdf(html, {
 ```ts
 await htmlToPdf(html, {
   protect: {
-    userPassword: "open123",
-    ownerPassword: "admin456",
+    userPassword: 'open123',
+    ownerPassword: 'admin456',
     permissions: {
-      printing: "highResolution",
+      printing: 'highResolution',
       copying: false,
       modifying: false,
     },
@@ -175,12 +175,12 @@ Encryption is delegated to PDFKit (which `pdfmake` uses underneath), so no extra
 ### Merge
 
 ```ts
-import { mergePdfs } from "html-pdf-forge/merge";
+import { mergePdfs } from 'html-pdf-forge/merge';
 
-const merged = await mergePdfs([pdf1, await pdf2.toBuffer(), "./third.pdf"], {
-  metadata: { title: "Combined Bundle" },
+const merged = await mergePdfs([pdf1, await pdf2.toBuffer(), './third.pdf'], {
+  metadata: { title: 'Combined Bundle' },
 });
-await merged.saveToFile("./bundle.pdf");
+await merged.saveToFile('./bundle.pdf');
 ```
 
 Accepts `Buffer`, `Uint8Array`, file paths, or any `PdfResult` interchangeably.
@@ -188,14 +188,14 @@ Accepts `Buffer`, `Uint8Array`, file paths, or any `PdfResult` interchangeably.
 ### Split
 
 ```ts
-import { splitPdf } from "html-pdf-forge/split";
+import { splitPdf } from 'html-pdf-forge/split';
 
 const parts = await splitPdf(buffer, [
   [1, 3],
   [4, 6],
 ]);
-await parts[0].saveToFile("./first.pdf");
-await parts[1].saveToFile("./second.pdf");
+await parts[0].saveToFile('./first.pdf');
+await parts[1].saveToFile('./second.pdf');
 ```
 
 Ranges are 1-indexed and inclusive. Out-of-range or reversed ranges throw `PdfSplitError`.
@@ -235,26 +235,26 @@ Drop a `<pdf-qr>` element into your HTML — the pipeline auto-renders it to an 
 ### Before
 
 ```ts
-import htmlToPdfmake from "html-to-pdfmake";
-import PdfPrinter from "pdfmake";
-import { JSDOM } from "jsdom";
+import htmlToPdfmake from 'html-to-pdfmake';
+import PdfPrinter from 'pdfmake';
+import { JSDOM } from 'jsdom';
 
 const fonts = {
-  Roboto: { normal: "Roboto-Regular.ttf", bold: "Roboto-Medium.ttf" },
+  Roboto: { normal: 'Roboto-Regular.ttf', bold: 'Roboto-Medium.ttf' },
 };
 const printer = new PdfPrinter(fonts);
-const window = new JSDOM("").window;
+const window = new JSDOM('').window;
 
-const content = htmlToPdfmake("<h1>Hello</h1>", { window });
+const content = htmlToPdfmake('<h1>Hello</h1>', { window });
 const doc = printer.createPdfKitDocument({
   content,
-  pageSize: "A4",
-  info: { title: "Hello" },
+  pageSize: 'A4',
+  info: { title: 'Hello' },
 });
 
 const chunks = [];
-doc.on("data", (c) => chunks.push(c));
-doc.on("end", () => {
+doc.on('data', (c) => chunks.push(c));
+doc.on('end', () => {
   const buffer = Buffer.concat(chunks);
   // ... write to disk ...
 });
@@ -264,10 +264,10 @@ doc.end();
 ### After
 
 ```ts
-import { htmlToPdf } from "html-pdf-forge";
+import { htmlToPdf } from 'html-pdf-forge';
 
-const pdf = await htmlToPdf("<h1>Hello</h1>", { metadata: { title: "Hello" } });
-await pdf.saveToFile("./hello.pdf");
+const pdf = await htmlToPdf('<h1>Hello</h1>', { metadata: { title: 'Hello' } });
+await pdf.saveToFile('./hello.pdf');
 ```
 
 The wrapper preserves access to `html-to-pdfmake`'s lower-level options via `converterOptions`, so anything you can do with the raw library you can still do here.
@@ -279,6 +279,29 @@ Runnable examples live in [`examples/`](./examples/):
 - [`basic.ts`](./examples/basic.ts) — minimum viable usage
 - [`templates.ts`](./examples/templates.ts) — invoice rendering with iteration
 - [`custom-fonts.ts`](./examples/custom-fonts.ts) — Buffer-backed and file-path fonts
+
+## Development
+
+```sh
+npm install
+npm run typecheck    # tsc --noEmit
+npm run lint         # eslint .
+npm run lint:fix     # eslint . --fix
+npm run format       # prettier --write .
+npm run format:check # prettier --check .
+npm test             # vitest run
+npm run build        # tsc -p tsconfig.build.json
+```
+
+Releases are managed with [Changesets](https://github.com/changesets/changesets):
+
+```sh
+npm run changeset            # record an intended bump
+npm run changeset:version    # apply queued changesets, bump version, write CHANGELOG
+npm run changeset:publish    # build + publish to npm
+```
+
+CI runs lint, format check, typecheck, tests, and build on every push and PR (Node 18 / 20 / 22).
 
 ## CSS support
 

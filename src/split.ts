@@ -25,9 +25,7 @@ export type PageRange = [number, number];
 
 function isPdfResult(value: unknown): value is PdfResult {
   return Boolean(
-    value &&
-      typeof value === 'object' &&
-      typeof (value as PdfResult).toBuffer === 'function',
+    value && typeof value === 'object' && typeof (value as PdfResult).toBuffer === 'function',
   );
 }
 
@@ -47,7 +45,9 @@ async function readSource(input: SplitInput): Promise<Uint8Array> {
     const data = await fs.readFile(fullPath);
     return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
   }
-  throw new PdfSplitError('Unsupported split source. Use Buffer, Uint8Array, PdfResult, or a file path.');
+  throw new PdfSplitError(
+    'Unsupported split source. Use Buffer, Uint8Array, PdfResult, or a file path.',
+  );
 }
 
 function validateRange(range: PageRange, totalPages: number): void {

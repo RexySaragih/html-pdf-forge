@@ -59,7 +59,6 @@ let bwipModule: BwipModule | null = null;
 
 function loadBwipjs(): BwipModule {
   if (bwipModule === null) {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const loaded = require('bwip-js') as BwipModule | { default: BwipModule };
     bwipModule = 'toBuffer' in loaded ? loaded : loaded.default;
   }

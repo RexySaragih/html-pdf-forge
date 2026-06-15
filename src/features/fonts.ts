@@ -75,7 +75,6 @@ function loadBundledRoboto(): TFontDictionary[string] {
   // current versions (0.2.x) export the VFS object directly. Handle both.
   let vfsModule: unknown;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     vfsModule = require('pdfmake/build/vfs_fonts.js');
   } catch (err) {
     throw new FontLoadError(
@@ -85,9 +84,7 @@ function loadBundledRoboto(): TFontDictionary[string] {
   }
   const vfs = extractVfs(vfsModule);
   if (!vfs) {
-    throw new FontLoadError(
-      'pdfmake/build/vfs_fonts.js did not expose the expected vfs object.',
-    );
+    throw new FontLoadError('pdfmake/build/vfs_fonts.js did not expose the expected vfs object.');
   }
   const decode = (key: string): Buffer => {
     const base64 = vfs[key];

@@ -73,7 +73,10 @@ describe('Embedding images', () => {
     beforeEach(() => {
       originalFetch = globalThis.fetch;
       globalThis.fetch = (async () =>
-        new Response('not found', { status: 404, statusText: 'Not Found' })) as typeof globalThis.fetch;
+        new Response('not found', {
+          status: 404,
+          statusText: 'Not Found',
+        })) as typeof globalThis.fetch;
     });
 
     afterEach(() => {
@@ -81,9 +84,9 @@ describe('Embedding images', () => {
     });
 
     it('surfaces an ImageProcessingError with the failed URL', async () => {
-      await expect(
-        htmlToPdf('<img src="https://example.com/missing.png" />'),
-      ).rejects.toThrow(/Failed to fetch image/);
+      await expect(htmlToPdf('<img src="https://example.com/missing.png" />')).rejects.toThrow(
+        /Failed to fetch image/,
+      );
     });
   });
 });

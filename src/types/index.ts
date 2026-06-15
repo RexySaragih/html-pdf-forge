@@ -48,10 +48,7 @@ export interface FontDefinition {
   bolditalics?: string | Buffer;
 }
 
-export type HeaderFooterFn = (
-  currentPage: number,
-  pageCount: number,
-) => string | null | undefined;
+export type HeaderFooterFn = (currentPage: number, pageCount: number) => string | null | undefined;
 
 export type HeaderFooterInput = string | HeaderFooterFn;
 
