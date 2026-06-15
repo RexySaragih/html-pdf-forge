@@ -1,6 +1,6 @@
 {
   "name": "@rexymayderio/html-pdf-forge",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Generate PDFs from HTML with a clean TypeScript API. Wraps html-to-pdfmake + pdfmake into a single, ergonomic surface.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -59,7 +59,7 @@
   "bugs": {
     "url": "https://github.com/RexySaragih/html-pdf-forge/issues"
   },
-  "homepage": "https://github.com/RexySaragih/html-pdf-forge#readme",
+  "homepage": "https://html-pdf-forge.rexy-jms.dev/",
   "license": "MIT",
   "engines": {
     "node": ">=18"

@@ -2,6 +2,8 @@
 
 Generate PDFs from HTML with a clean TypeScript API. No headless browser, no native bindings, deterministic output.
 
+📖 **Documentation & Playground**: [html-pdf-forge.rexy-jms.dev](https://html-pdf-forge.rexy-jms.dev/)
+
 A thin wrapper over [`html-to-pdfmake`](https://github.com/Aymkdn/html-to-pdfmake) and [`pdfmake`](https://github.com/bpampuch/pdfmake) that collapses the two-step pipeline into a single, ergonomic call. Adds first-class support for templates, headers/footers, page numbering, watermarks, merge/split, password protection, QR codes, and barcodes.
 
 ```ts
@@ -333,13 +335,13 @@ All errors thrown by html-pdf-forge extend `HtmlPdfForgeError`. Specific subclas
 
 ## Project status
 
-| Area                     | Status                                                      |
-| ------------------------ | ----------------------------------------------------------- |
-| Version                  | 1.4.0                                                       |
-| Core API and feature set | Stable                                                      |
-| Test suite               | 41 behavioral tests, vitest                                 |
-| Code quality             | ESLint (flat config) + Prettier, enforced in CI             |
-| Documentation            | This README + JSDoc; full docs site planned                 |
+| Area                     | Status                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| Version                  | 1.4.0                                                                                     |
+| Core API and feature set | Stable                                                                                    |
+| Test suite               | 41 behavioral tests, vitest                                                               |
+| Code quality             | ESLint (flat config) + Prettier, enforced in CI                                           |
+| Documentation            | [html-pdf-forge.rexy-jms.dev](https://html-pdf-forge.rexy-jms.dev/) + this README + JSDoc |
 
 ## License
 
