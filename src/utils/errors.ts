@@ -46,3 +46,31 @@ export class TemplateRenderError extends HtmlPdfForgeError {
     this.name = 'TemplateRenderError';
   }
 }
+
+export class PdfMergeError extends HtmlPdfForgeError {
+  constructor(message: string, cause?: unknown) {
+    super(message, cause);
+    this.name = 'PdfMergeError';
+  }
+}
+
+export class PdfSplitError extends HtmlPdfForgeError {
+  constructor(message: string, cause?: unknown) {
+    super(message, cause);
+    this.name = 'PdfSplitError';
+  }
+}
+
+export class BarcodeRenderError extends HtmlPdfForgeError {
+  constructor(message: string, cause?: unknown) {
+    super(message, cause);
+    this.name = 'BarcodeRenderError';
+  }
+}
+
+export class QrCodeRenderError extends HtmlPdfForgeError {
+  constructor(message: string, cause?: unknown) {
+    super(message, cause);
+    this.name = 'QrCodeRenderError';
+  }
+}

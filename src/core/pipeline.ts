@@ -27,6 +27,10 @@ import { resolveStyles } from '../features/styling';
 import { buildPdfInfo } from '../features/metadata';
 import { buildHeaderFooter } from '../features/header-footer';
 import { pageNumberRenderer } from '../features/pagination';
+import { buildWatermark } from '../features/watermark';
+import { buildProtection } from '../features/protect';
+import { inlineQrCodes } from '../features/qr';
+import { inlineBarcodes } from '../features/barcode';
 
 const DEFAULT_MARGINS: Margins = { top: 40, right: 40, bottom: 40, left: 40 };
 const DEFAULT_PAGE_SIZE = 'A4';
@@ -51,7 +55,11 @@ export async function buildDocDefinition(
   html: string,
   options: HtmlPdfOptions,
 ): Promise<TDocumentDefinitions> {
-  const inlined = await inlineImages(html);
+  // Custom HTML elements (QR, barcode) run first — they emit standard <img>
+  // tags that the image inliner then handles uniformly.
+  const withQr = await inlineQrCodes(html);
+  const withBarcodes = await inlineBarcodes(withQr);
+  const inlined = await inlineImages(withBarcodes);
   const styles = resolveStyles(options.styles, options.resetStyles ?? false);
 
   const content = convertHtmlToPdfmake(inlined, {
@@ -71,6 +79,16 @@ export async function buildDocDefinition(
     info: buildPdfInfo(options.metadata),
     defaultStyle: { font: defaultFont },
   };
+
+  const watermark = buildWatermark(options.watermark);
+  if (watermark) docDefinition.watermark = watermark;
+
+  // Password protection passes through pdfmake into PDFKit. The pdfmake
+  // typings don't include these keys so we attach them via a typed view.
+  const protection = buildProtection(options.protect);
+  if (protection) {
+    Object.assign(docDefinition as unknown as Record<string, unknown>, protection);
+  }
 
   const headerFn = buildHeaderFooter(
     options.header,

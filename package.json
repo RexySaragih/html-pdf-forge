@@ -1,9 +1,26 @@
 {
   "name": "html-pdf-forge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Generate PDFs from HTML with a clean TypeScript API. Wraps html-to-pdfmake + pdfmake into a single, ergonomic surface.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./merge": {
+      "types": "./dist/merge.d.ts",
+      "import": "./dist/merge.js",
+      "require": "./dist/merge.js"
+    },
+    "./split": {
+      "types": "./dist/split.d.ts",
+      "import": "./dist/split.js",
+      "require": "./dist/split.js"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -11,6 +28,8 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -19,23 +38,33 @@
     "html-to-pdf",
     "pdfmake",
     "html-to-pdfmake",
-    "pdf-generation"
+    "pdf-generation",
+    "watermark",
+    "qr-code",
+    "barcode",
+    "pdf-merge",
+    "pdf-split"
   ],
   "license": "MIT",
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "bwip-js": "^4.5.1",
     "html-to-pdfmake": "^2.5.18",
     "jsdom": "^24.1.0",
     "mustache": "^4.2.0",
-    "pdfmake": "^0.2.10"
+    "pdf-lib": "^1.17.1",
+    "pdfmake": "^0.2.10",
+    "qrcode": "^1.5.3"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.14.0",
     "@types/pdfmake": "^0.2.9",
-    "typescript": "^5.5.4"
+    "@types/qrcode": "^1.5.5",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
   }
 }

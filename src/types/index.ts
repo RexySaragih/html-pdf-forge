@@ -82,6 +82,46 @@ export interface PageNumberOptions {
 }
 
 /**
+ * Watermark options. Mapped to pdfmake's native `watermark` document key.
+ * A plain string is treated as `{ text: <string> }` with default styling.
+ */
+export interface WatermarkOptions {
+  text: string;
+  color?: string;
+  opacity?: number;
+  bold?: boolean;
+  italics?: boolean;
+  fontSize?: number;
+  /** Rotation in degrees. Default: -45. */
+  angle?: number;
+}
+
+export type WatermarkInput = string | WatermarkOptions;
+
+/**
+ * Permissions for password-protected PDFs.
+ * Maps to PDFKit's permission flags exposed via pdfmake's doc definition.
+ */
+export interface PdfPermissions {
+  /** 'lowResolution' | 'highResolution' | false. Default: 'highResolution'. */
+  printing?: 'lowResolution' | 'highResolution' | false;
+  modifying?: boolean;
+  copying?: boolean;
+  annotating?: boolean;
+  fillingForms?: boolean;
+  contentAccessibility?: boolean;
+  documentAssembly?: boolean;
+}
+
+export interface ProtectOptions {
+  /** Password required to open the PDF. Optional — set only owner if you want unrestricted open with restricted ops. */
+  userPassword?: string;
+  /** Password required to change permissions. Strongly recommended. */
+  ownerPassword?: string;
+  permissions?: PdfPermissions;
+}
+
+/**
  * Options accepted by `htmlToPdf` and `HtmlPdfForge.generate`.
  * Every field is optional. Sensible defaults are applied for omitted fields.
  */
@@ -98,6 +138,10 @@ export interface HtmlPdfOptions {
   footer?: HeaderFooterInput;
   pageNumber?: PageNumberOptions;
   metadata?: PdfMetadata;
+  /** Renders a diagonal text watermark on every page. Pass a string for the simple case. */
+  watermark?: WatermarkInput;
+  /** Encrypt the PDF with user / owner passwords and permission flags. */
+  protect?: ProtectOptions;
   /** Extra options passed straight through to html-to-pdfmake. */
   converterOptions?: Record<string, unknown>;
 }

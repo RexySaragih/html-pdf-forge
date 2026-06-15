@@ -10,6 +10,14 @@ export { htmlToPdf } from './core/pipeline';
 export { HtmlPdfForge } from './forge';
 export { createTemplate } from './features/template';
 
+// Phase 2 surface — also re-exported here for convenience. Subpath imports
+// (`html-pdf-forge/merge`, `html-pdf-forge/split`) are the canonical entry
+// points for tree-shaking-sensitive consumers.
+export { mergePdfs } from './merge';
+export type { MergeInput, MergeOptions } from './merge';
+export { splitPdf } from './split';
+export type { SplitInput, PageRange } from './split';
+
 export type { Template, TemplateOptions } from './features/template';
 
 export type {
@@ -27,6 +35,10 @@ export type {
   StyleMap,
   PageNumberOptions,
   PageNumberPlacement,
+  WatermarkInput,
+  WatermarkOptions,
+  ProtectOptions,
+  PdfPermissions,
 } from './types';
 
 export {
@@ -36,4 +48,8 @@ export {
   FontLoadError,
   ImageProcessingError,
   TemplateRenderError,
+  PdfMergeError,
+  PdfSplitError,
+  BarcodeRenderError,
+  QrCodeRenderError,
 } from './utils/errors';
