@@ -333,11 +333,13 @@ All errors thrown by html-pdf-forge extend `HtmlPdfForgeError`. Specific subclas
 
 ## Project status
 
-| Area                     | Status                                      |
-| ------------------------ | ------------------------------------------- |
-| Core API and feature set | Stable                                      |
-| Test suite               | 41 behavioral tests, vitest                 |
-| Documentation            | This README + JSDoc; full docs site planned |
+| Area                     | Status                                                      |
+| ------------------------ | ----------------------------------------------------------- |
+| Version                  | 1.4.0                                                       |
+| Core API and feature set | Stable                                                      |
+| Test suite               | 41 behavioral tests, vitest                                 |
+| Code quality             | ESLint (flat config) + Prettier, enforced in CI             |
+| Documentation            | This README + JSDoc; full docs site planned                 |
 
 ## License
 
