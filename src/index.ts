@@ -1,22 +1,23 @@
 /**
  * html-pdf-forge — public API barrel.
  *
- * The main entry point for the package. Anything that's not exported from
- * here is considered an internal implementation detail and may change without
- * a major version bump.
+ * Importing from `'html-pdf-forge'` gives you the HTML → PDF pipeline,
+ * templates, and the stateful `HtmlPdfForge` class. Heavy optional features
+ * live behind subpath imports so they don't add to your bundle / runtime
+ * memory unless you actually use them:
+ *
+ *   import { mergePdfs } from 'html-pdf-forge/merge';
+ *   import { splitPdf } from 'html-pdf-forge/split';
+ *
+ * QR code (`<pdf-qr>`) and barcode (`<pdf-barcode>`) support is built into
+ * the main pipeline but lazy-loaded — the `qrcode` and `bwip-js` packages
+ * are only required when the input HTML actually contains those custom
+ * elements. Plain HTML never pays for them.
  */
 
 export { htmlToPdf } from './core/pipeline';
 export { HtmlPdfForge } from './forge';
 export { createTemplate } from './features/template';
-
-// Phase 2 surface — also re-exported here for convenience. Subpath imports
-// (`html-pdf-forge/merge`, `html-pdf-forge/split`) are the canonical entry
-// points for tree-shaking-sensitive consumers.
-export { mergePdfs } from './merge';
-export type { MergeInput, MergeOptions } from './merge';
-export { splitPdf } from './split';
-export type { SplitInput, PageRange } from './split';
 
 export type { Template, TemplateOptions } from './features/template';
 
@@ -41,6 +42,9 @@ export type {
   PdfPermissions,
 } from './types';
 
+// Error classes are pure JS (no heavy deps), so re-exporting them here is
+// free. Importing them from `'html-pdf-forge'` does NOT pull in pdf-lib,
+// qrcode, or bwip-js.
 export {
   HtmlPdfForgeError,
   HtmlConversionError,

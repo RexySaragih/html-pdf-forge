@@ -16,9 +16,13 @@
  *   - height        (optional) — output height in pixels, default 60
  *   - scale         (optional) — bwip-js scale factor, default 3
  *   - includetext   (optional) — 'true' | 'false', default 'true'
+ *
+ * Performance note:
+ *   `bwip-js` is loaded lazily and only when the input HTML actually contains
+ *   a `<pdf-barcode` token. Documents without barcodes never pay the
+ *   require cost.
  */
 
-import bwipjs from 'bwip-js';
 import { getJsdomWindow } from '../utils/jsdom';
 import { BarcodeRenderError } from '../utils/errors';
 
@@ -26,6 +30,8 @@ const DEFAULT_WIDTH_PX = 200;
 const DEFAULT_HEIGHT_PX = 60;
 const DEFAULT_SCALE = 3;
 const PDF_BARCODE_SELECTOR = 'pdf-barcode';
+const PDF_BARCODE_TOKEN = '<pdf-barcode';
+const POINTS_PER_MM = 2.83;
 
 interface BarcodeAttrs {
   bcid: string;
@@ -34,6 +40,30 @@ interface BarcodeAttrs {
   heightPx: number;
   scale: number;
   includetext: boolean;
+}
+
+interface BwipBufferOptions {
+  bcid: string;
+  text: string;
+  scale?: number;
+  height?: number;
+  includetext?: boolean;
+  textxalign?: string;
+}
+
+interface BwipModule {
+  toBuffer(options: BwipBufferOptions): Promise<Buffer | Uint8Array>;
+}
+
+let bwipModule: BwipModule | null = null;
+
+function loadBwipjs(): BwipModule {
+  if (bwipModule === null) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const loaded = require('bwip-js') as BwipModule | { default: BwipModule };
+    bwipModule = 'toBuffer' in loaded ? loaded : loaded.default;
+  }
+  return bwipModule;
 }
 
 function parsePositiveInt(raw: string | null, fallback: number): number {
@@ -68,7 +98,8 @@ async function renderBarcodeDataUri(attrs: BarcodeAttrs): Promise<string> {
     // bwip-js's `height` uses millimeters under the hood; `scale` controls
     // pixel-density. We feed scale + a derived mm height so the output
     // approximates the requested pixel size.
-    const heightMm = Math.max(1, Math.round(attrs.heightPx / attrs.scale / 2.83));
+    const heightMm = Math.max(1, Math.round(attrs.heightPx / attrs.scale / POINTS_PER_MM));
+    const bwipjs = loadBwipjs();
     const buffer = await bwipjs.toBuffer({
       bcid: attrs.bcid,
       text: attrs.text,
@@ -89,10 +120,16 @@ async function renderBarcodeDataUri(attrs: BarcodeAttrs): Promise<string> {
 /**
  * Walks every `<pdf-barcode>` element in `html`, generates the PNG, and
  * replaces the tag with an `<img>` carrying the data URI. Returns the
- * rewritten HTML. If no `<pdf-barcode>` tags exist, the input is returned
- * unchanged.
+ * rewritten HTML. If the input has no `<pdf-barcode` token, the input is
+ * returned unchanged and `bwip-js` is never loaded.
  */
 export async function inlineBarcodes(html: string): Promise<string> {
+  // Cheap pre-check: skip JSDOM parsing and `bwip-js` loading entirely when
+  // there's no barcode tag to process.
+  if (!html.includes(PDF_BARCODE_TOKEN)) {
+    return html;
+  }
+
   const window = getJsdomWindow();
   const doc = window.document.implementation.createHTMLDocument('');
   doc.body.innerHTML = html;
