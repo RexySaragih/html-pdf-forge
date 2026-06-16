@@ -66,6 +66,13 @@ export async function buildDocDefinition(
   const page = options.page ?? {};
   const pageNumberFn = pageNumberRenderer(options.pageNumber);
 
+  // Inline images in static header/footer HTML upfront (async), so the sync
+  // pdfmake callback receives already-resolved data URIs.
+  const resolvedHeader =
+    typeof options.header === 'string' ? await inlineImages(options.header) : options.header;
+  const resolvedFooter =
+    typeof options.footer === 'string' ? await inlineImages(options.footer) : options.footer;
+
   const docDefinition: TDocumentDefinitions = {
     content,
     pageSize: mapPageSize(page),
@@ -88,12 +95,14 @@ export async function buildDocDefinition(
   const headerFn = buildHeaderFooter(
     options.header,
     options.pageNumber?.placement === 'header' ? pageNumberFn : null,
+    resolvedHeader,
   );
   if (headerFn) docDefinition.header = headerFn;
 
   const footerFn = buildHeaderFooter(
     options.footer,
     options.pageNumber?.placement === 'footer' ? pageNumberFn : null,
+    resolvedFooter,
   );
   if (footerFn) docDefinition.footer = footerFn;
 

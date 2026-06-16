@@ -25,16 +25,23 @@ function asFunction(input: HeaderFooterInput): HeaderFooterFn {
  * shape pdfmake expects. The returned function is safe to call once per page;
  * it never returns null/undefined — empty content collapses to an empty
  * pdfmake text node so pdfmake doesn't choke.
+ *
+ * `resolvedInput` should be the already-image-inlined version of `primary`
+ * when `primary` is a static string — pass it from the async pipeline so the
+ * sync pdfmake callback never has to fetch anything.
  */
 export function buildHeaderFooter(
   primary: HeaderFooterInput | undefined,
   fallback: HeaderFooterFn | null,
+  resolvedInput?: HeaderFooterInput,
 ): PdfmakeHeaderFooter | undefined {
   if (primary === undefined && !fallback) {
     return undefined;
   }
 
-  const primaryFn = primary !== undefined ? asFunction(primary) : null;
+  // Use the pre-resolved (image-inlined) version when available.
+  const effective = resolvedInput ?? primary;
+  const primaryFn = effective !== undefined ? asFunction(effective) : null;
 
   return (currentPage: number, pageCount: number): Content => {
     const html = primaryFn?.(currentPage, pageCount) ?? fallback?.(currentPage, pageCount);

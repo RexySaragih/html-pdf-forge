@@ -59,8 +59,14 @@ let bwipModule: BwipModule | null = null;
 
 function loadBwipjs(): BwipModule {
   if (bwipModule === null) {
-    const loaded = require('bwip-js') as BwipModule | { default: BwipModule };
-    bwipModule = 'toBuffer' in loaded ? loaded : loaded.default;
+    try {
+      const loaded = require('bwip-js') as BwipModule | { default: BwipModule };
+      bwipModule = 'toBuffer' in loaded ? loaded : loaded.default;
+    } catch {
+      throw new BarcodeRenderError(
+        'bwip-js is required for barcode rendering. Install it: npm install bwip-js',
+      );
+    }
   }
   return bwipModule;
 }

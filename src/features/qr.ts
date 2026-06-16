@@ -43,8 +43,14 @@ let qrcodeModule: QRCodeModule | null = null;
 
 function loadQrcode(): QRCodeModule {
   if (qrcodeModule === null) {
-    const loaded = require('qrcode') as QRCodeModule | { default: QRCodeModule };
-    qrcodeModule = 'toDataURL' in loaded ? loaded : loaded.default;
+    try {
+      const loaded = require('qrcode') as QRCodeModule | { default: QRCodeModule };
+      qrcodeModule = 'toDataURL' in loaded ? loaded : loaded.default;
+    } catch {
+      throw new QrCodeRenderError(
+        'qrcode is required for QR code rendering. Install it: npm install qrcode',
+      );
+    }
   }
   return qrcodeModule;
 }

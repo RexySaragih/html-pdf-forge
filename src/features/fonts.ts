@@ -7,6 +7,10 @@
  *
  * If no fonts are provided, we fall back to pdfmake's bundled Roboto via the
  * VFS that ships with the package.
+ *
+ * Built-in web fonts (e.g. Inter) are fetched from bunny.net CDN on first use
+ * and cached in memory for the lifetime of the process — no download cost for
+ * callers who don't use them.
  */
 
 import { promises as fs } from 'fs';
@@ -23,6 +27,79 @@ const ROBOTO_VFS_KEYS: Record<keyof FontDefinition, string> = {
   italics: 'Roboto-Italic.ttf',
   bolditalics: 'Roboto-MediumItalic.ttf',
 };
+
+// ─── Built-in web font registry ───────────────────────────────────────────────
+// TTF variants from bunny.net — open CDN, no tracking, proper TTF (not woff2).
+// Add entries here to support additional named fonts without user configuration.
+
+const WEB_FONT_TTF_URLS: Record<string, Record<keyof FontDefinition, string>> = {
+  Inter: {
+    normal: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.ttf',
+    bold: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.ttf',
+    italics: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-italic.ttf',
+    bolditalics: 'https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-italic.ttf',
+  },
+  // Arimo is metrically identical to Helvetica/Arial — same glyph widths, correct
+  // for documents that specify Helvetica as the intended font.
+  Helvetica: {
+    normal: 'https://cdn.jsdelivr.net/fontsource/fonts/arimo@latest/latin-400-normal.ttf',
+    bold: 'https://cdn.jsdelivr.net/fontsource/fonts/arimo@latest/latin-700-normal.ttf',
+    italics: 'https://cdn.jsdelivr.net/fontsource/fonts/arimo@latest/latin-400-italic.ttf',
+    bolditalics: 'https://cdn.jsdelivr.net/fontsource/fonts/arimo@latest/latin-700-italic.ttf',
+  },
+};
+
+// In-memory cache: fontName → resolved TFontDictionary entry
+const webFontCache = new Map<string, Promise<TFontDictionary[string]>>();
+
+async function fetchFontVariant(url: string, fontName: string, variant: string): Promise<Buffer> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new FontLoadError(
+        `Failed to fetch font '${fontName}' (${variant}) from ${url}: ${res.status} ${res.statusText}`,
+      );
+    }
+    return Buffer.from(await res.arrayBuffer());
+  } catch (err) {
+    if (err instanceof FontLoadError) throw err;
+    throw new FontLoadError(`Network error fetching font '${fontName}' (${variant})`, err);
+  }
+}
+
+async function loadWebFont(name: string): Promise<TFontDictionary[string]> {
+  const urls = WEB_FONT_TTF_URLS[name];
+  if (!urls) {
+    throw new FontLoadError(
+      `Built-in font '${name}' is not registered. Provide it via the 'fonts' option instead.`,
+    );
+  }
+  const [normal, bold, italics, bolditalics] = await Promise.all([
+    fetchFontVariant(urls.normal, name, 'normal'),
+    fetchFontVariant(urls.bold, name, 'bold'),
+    fetchFontVariant(urls.italics, name, 'italics'),
+    fetchFontVariant(urls.bolditalics, name, 'bolditalics'),
+  ]);
+  return {
+    normal: normal as unknown as string,
+    bold: bold as unknown as string,
+    italics: italics as unknown as string,
+    bolditalics: bolditalics as unknown as string,
+  };
+}
+
+function getWebFont(name: string): Promise<TFontDictionary[string]> {
+  if (!webFontCache.has(name)) {
+    webFontCache.set(name, loadWebFont(name));
+  }
+  return webFontCache.get(name)!;
+}
+
+export function isBuiltInWebFont(name: string): boolean {
+  return name in WEB_FONT_TTF_URLS;
+}
+
+// ─── Custom font resolution ───────────────────────────────────────────────────
 
 interface ResolvedFonts {
   fonts: TFontDictionary;
@@ -58,10 +135,6 @@ async function resolveFontDefinition(
   if (def.bolditalics !== undefined) {
     resolved.bolditalics = (await resolveFontVariant(def.bolditalics)) as unknown as string;
   }
-  if (Object.keys(resolved).length === 1 && resolved.normal) {
-    // pdfmake requires at least bold/italics/bolditalics if you reference them,
-    // but it's happy with just `normal` if only normal is needed.
-  }
   if (!def.bold) resolved.bold = resolved.normal;
   if (!def.italics) resolved.italics = resolved.normal;
   if (!def.bolditalics) resolved.bolditalics = resolved.bold ?? resolved.normal;
@@ -69,16 +142,18 @@ async function resolveFontDefinition(
   return resolved;
 }
 
-function loadBundledRoboto(): TFontDictionary[string] {
-  // pdfmake ships its bundled Roboto via vfs_fonts.js. Older pdfmake versions
-  // exported `{ pdfMake: { vfs: { 'Roboto-Regular.ttf': '<base64>', ... } } }`;
-  // current versions (0.2.x) export the VFS object directly. Handle both.
+/**
+ * Lazily loads bundled Roboto from pdfmake's VFS. This is deferred via
+ * dynamic import() so that the ~3MB base64 font data is only loaded when
+ * the user doesn't supply custom fonts or a built-in web font name.
+ */
+async function loadBundledRoboto(): Promise<TFontDictionary[string]> {
   let vfsModule: unknown;
   try {
-    vfsModule = require('pdfmake/build/vfs_fonts.js');
+    vfsModule = await import('pdfmake/build/vfs_fonts.js');
   } catch (err) {
     throw new FontLoadError(
-      'Bundled Roboto font is unavailable. Provide `fonts` in options to use a custom font.',
+      'Bundled Roboto font is unavailable. Install pdfmake or provide `fonts`/`defaultFont` in options.',
       err,
     );
   }
@@ -117,9 +192,15 @@ function extractVfs(mod: unknown): Record<string, string> | null {
   return null;
 }
 
+// ─── Public API ───────────────────────────────────────────────────────────────
+
 /**
  * Builds the pdfmake font dictionary plus the default font name to use in the
- * generated document. If `fonts` is empty, we fall back to bundled Roboto.
+ * generated document. Resolution order:
+ *
+ * 1. User-supplied `fonts` map (file paths or Buffers)
+ * 2. Built-in web font auto-fetch when `defaultFont` names one (e.g. 'Inter')
+ * 3. Bundled Roboto fallback
  */
 export async function buildFontDictionary(
   fonts: Record<string, FontDefinition> | undefined,
@@ -137,6 +218,12 @@ export async function buildFontDictionary(
     return { fonts: resolved, defaultFont: chosen };
   }
 
-  resolved[DEFAULT_ROBOTO_FONT_NAME] = loadBundledRoboto();
+  // Auto-load a built-in web font when requested and no custom fonts supplied.
+  if (defaultFont && isBuiltInWebFont(defaultFont)) {
+    resolved[defaultFont] = await getWebFont(defaultFont);
+    return { fonts: resolved, defaultFont };
+  }
+
+  resolved[DEFAULT_ROBOTO_FONT_NAME] = await loadBundledRoboto();
   return { fonts: resolved, defaultFont: DEFAULT_ROBOTO_FONT_NAME };
 }

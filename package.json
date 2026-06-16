@@ -1,6 +1,6 @@
 {
   "name": "@rexymayderio/html-pdf-forge",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Generate PDFs from HTML with a clean TypeScript API. Wraps html-to-pdfmake + pdfmake into a single, ergonomic surface.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,6 +19,16 @@
       "types": "./dist/split.d.ts",
       "import": "./dist/split.js",
       "require": "./dist/split.js"
+    },
+    "./qr": {
+      "types": "./dist/features/qr.d.ts",
+      "import": "./dist/features/qr.js",
+      "require": "./dist/features/qr.js"
+    },
+    "./barcode": {
+      "types": "./dist/features/barcode.d.ts",
+      "import": "./dist/features/barcode.js",
+      "require": "./dist/features/barcode.js"
     }
   },
   "files": [
@@ -65,13 +75,23 @@
     "node": ">=18"
   },
   "dependencies": {
-    "bwip-js": "^4.5.1",
     "html-to-pdfmake": "^2.5.18",
     "jsdom": "^24.1.0",
     "mustache": "^4.2.0",
     "pdf-lib": "^1.17.1",
-    "pdfmake": "^0.2.10",
+    "pdfmake": "^0.2.10"
+  },
+  "peerDependencies": {
+    "bwip-js": "^4.5.1",
     "qrcode": "^1.5.3"
+  },
+  "peerDependenciesMeta": {
+    "bwip-js": {
+      "optional": true
+    },
+    "qrcode": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0",

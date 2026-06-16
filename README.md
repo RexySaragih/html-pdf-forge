@@ -33,6 +33,18 @@ npm install html-pdf-forge
 
 Requires Node.js 18 or newer.
 
+### Optional dependencies
+
+QR code and barcode features require additional packages. Install them only if you need them:
+
+```sh
+# For <pdf-qr> elements
+npm install qrcode
+
+# For <pdf-barcode> elements
+npm install bwip-js
+```
+
 ## Quickstart
 
 ```ts
@@ -204,6 +216,8 @@ Ranges are 1-indexed and inclusive. Out-of-range or reversed ranges throw `PdfSp
 
 ### QR codes
 
+> **Requires**: `npm install qrcode`
+
 Drop a `<pdf-qr>` element into your HTML — the pipeline auto-renders it to an embedded image.
 
 ```html
@@ -219,6 +233,8 @@ Drop a `<pdf-qr>` element into your HTML — the pipeline auto-renders it to an 
 
 ### Barcodes
 
+> **Requires**: `npm install bwip-js`
+
 ```html
 <pdf-barcode type="code128" value="ABC-12345" width="220" height="70" />
 ```
@@ -231,6 +247,33 @@ Drop a `<pdf-qr>` element into your HTML — the pipeline auto-renders it to an 
 | `height`            | `60`     | Output height in pixels                                                                                 |
 | `scale`             | `3`      | bwip-js scale factor                                                                                    |
 | `includetext`       | `true`   | Render human-readable text below the barcode                                                            |
+
+## Subpath imports
+
+Heavy features are available as separate entry points so you can import only what you need:
+
+```ts
+import { htmlToPdf } from 'html-pdf-forge'; // Core PDF generation
+import { mergePdfs } from 'html-pdf-forge/merge'; // PDF merging
+import { splitPdf } from 'html-pdf-forge/split'; // PDF splitting
+import { inlineQrCodes } from 'html-pdf-forge/qr'; // QR preprocessing
+import { inlineBarcodes } from 'html-pdf-forge/barcode'; // Barcode preprocessing
+```
+
+## Font loading
+
+By default, the library uses pdfmake's bundled Roboto font. To avoid loading the ~3MB VFS font data, specify a built-in web font:
+
+```ts
+const pdf = await htmlToPdf(html, { defaultFont: 'Helvetica' });
+```
+
+Built-in web fonts (fetched from CDN on first use, cached in memory):
+
+- `Helvetica` — uses Arimo (metrically identical to Helvetica/Arial)
+- `Inter` — modern sans-serif
+
+The bundled Roboto VFS is only loaded as a fallback when no `defaultFont` or custom `fonts` are provided.
 
 ## Migration from raw `html-to-pdfmake` + `pdfmake`
 
@@ -337,7 +380,7 @@ All errors thrown by html-pdf-forge extend `HtmlPdfForgeError`. Specific subclas
 
 | Area                     | Status                                                                                    |
 | ------------------------ | ----------------------------------------------------------------------------------------- |
-| Version                  | 1.4.0                                                                                     |
+| Version                  | 1.4.2                                                                                     |
 | Core API and feature set | Stable                                                                                    |
 | Test suite               | 41 behavioral tests, vitest                                                               |
 | Code quality             | ESLint (flat config) + Prettier, enforced in CI                                           |
